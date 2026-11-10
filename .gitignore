@@ -1,0 +1,25 @@
+# Fichiers générés par Vivado
+*.cache/
+*.hw/
+*.runs/
+*.sim/
+*.ip_user_files/
+*.gen/
+.Xil/
+*.jou
+*.log
+*.str
+*.backup.jou
+*.backup.log
+*.dcp
+*.bit
+*.bin
+*.ltx
+*.wdb
+*.pb
+vivado_pid*.str
+vivado_*.backup.jou
+vivado_*.backup.log
+webtalk*.jou
+webtalk*.log
+hs_err_pid*.log
