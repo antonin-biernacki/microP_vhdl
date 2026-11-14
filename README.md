@@ -1,19 +1,20 @@
-# Processeur RISC-V minimal sur FPGA (Basys3)
+# Microprocesseur 32 bits minimal sur FPGA (Basys3)
 
-Processeur 32 bits décrit en **VHDL** et synthétisé avec **Vivado** pour une carte **Basys3**. Il s'inspire de l'architecture **RISC-V**. Un programme de démonstration est chargé dans la ROM, et son résultat s'affiche sur les LEDs de la carte.
+Processeur 32 bits décrit en **VHDL** et synthétisé avec **Vivado** pour une carte **Basys3**. Son organisation (banc de 32 registres, instructions à trois opérandes, accès mémoire par `LW` / `SW`) s'inspire de **RISC-V**, mais son jeu d'instructions est un jeu maison simplifié, incompatible avec RISC-V (voir [Différences avec RISC-V](#différences-avec-risc-v)). Un programme de démonstration est chargé dans la ROM, et son résultat s'affiche sur les LEDs de la carte.
 
 ## Sommaire
 
 - [Contexte](#contexte)
 - [Aperçu](#aperçu)
 - [Fonctionnalités](#fonctionnalités)
+- [Différences avec RISC-V](#différences-avec-risc-v)
 - [Structure du projet](#structure-du-projet)
 - [Matériel](#matériel)
 - [Compilation et téléversement](#compilation-et-téléversement)
 
 ## Contexte
 
-Le projet consiste à programmer un microprocesseur sur FPGA en VHDL. Il est construit à partir de modules simples (compteur de programme, ROM, décodeur, banc de registres, multiplexeur, ALU, RAM) assemblés dans un module `top`.
+Le projet consiste à concevoir un microprocesseur sur FPGA en VHDL. Il est construit à partir de modules simples (compteur de programme, ROM, décodeur, banc de registres, multiplexeur, ALU, RAM) assemblés dans un module `top`.
 
 ## Aperçu
 
@@ -65,7 +66,22 @@ Résultat attendu : les LEDs affichent **12**, soit `0000 0000 0000 1100` (LD2 e
 - 8 instructions : arithmétique et logique, accès mémoire, saut et branchement conditionnel
 - Valeurs immédiates sur 5 bits
 - 32 registres de 32 bits, RAM de 32 mots, ROM de 32 instructions
-- Affichage d'un registre sur les 16 LEDs de la carte
+- Exécution multicycle : chaque instruction prend 5 cycles d'horloge, le compteur de programme et les écritures n'étant validés qu'au dernier
+- Affichage sur les 16 LEDs des 16 bits de poids faible du registre `rs1` de l'instruction en cours
+
+## Différences avec RISC-V
+
+| Point                  | RISC-V (RV32I)                               | Ce processeur                                  |
+|------------------------|----------------------------------------------|------------------------------------------------|
+| Taille des instructions | 32 bits                                     | 21 bits                                        |
+| Encodage               | Formats R, I, S, B, U, J ; opcode sur 7 bits | Un seul format ; opcode maison sur 5 bits      |
+| Jeu d'instructions     | Une quarantaine d'instructions               | 8 instructions                                 |
+| Registre `x0` / `r0`   | Câblé à zéro                                 | Registre ordinaire (vaut 0 car jamais écrit)   |
+| Valeurs immédiates     | 12 bits signés (20 bits pour `LUI`)          | 5 bits non signés                              |
+| Sauts et branchements  | Relatifs au PC                               | Adresse absolue                                |
+| Exécution              | Libre (souvent en pipeline)                  | Multicycle, 5 cycles par instruction           |
+
+Un programme compilé pour RISC-V ne peut donc pas tourner sur ce processeur.
 
 ## Structure du projet
 
